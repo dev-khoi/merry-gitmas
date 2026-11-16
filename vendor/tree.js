@@ -3,7 +3,7 @@
 export function createTreeRenderer(canvas, options = {}) {
       const canvasWidth = canvas.width, canvasHeight = canvas.height;
       const layoutHeight = Math.max(64, canvasHeight - (options.reference ? 0 : (options.bottomPadding ?? 0)));
-      const ctx = canvas.getContext('2d', { alpha: false, willReadFrequently: true });
+      const ctx = canvas.getContext('2d', { alpha: !!options.transparent && !options.reference, willReadFrequently: true });
       if (!ctx) throw new Error('A 2D canvas context is required');
       const TAU = Math.PI * 2;
       const query = new URLSearchParams();
@@ -641,6 +641,13 @@ export function createTreeRenderer(canvas, options = {}) {
         HZ = 0.899;
 
       const BLACK = 0xff000000;
+      const background = options.transparent && !options.reference ? 0 : BLACK;
+      function glyphPixel(r, g, b, a) {
+        if (options.transparent && !options.reference) {
+          return (a << 24) | ((b | 0) << 16) | ((g | 0) << 8) | (r | 0);
+        }
+        return BLACK | (((b * a) >> 8) << 16) | (((g * a) >> 8) << 8) | ((r * a) >> 8);
+      }
 
       // Outline glyphs. Each cell tracks which of its 2x2 quadrants are covered
       // (bit 0 = top-left, 1 = top-right, 2 = bottom-left, 3 = bottom-right). On a
@@ -1037,7 +1044,7 @@ export function createTreeRenderer(canvas, options = {}) {
         let base =
           (gridY + row * cellH) * widthPx + gridX + (c - row * cols) * cellW;
         for (let y = 0; y < cellH; y++, base += widthPx)
-          pixels.fill(BLACK, base, base + cellW);
+          pixels.fill(background, base, base + cellW);
       }
 
       function blit(c, glyph, R, G, B) {
@@ -1052,10 +1059,7 @@ export function createTreeRenderer(canvas, options = {}) {
         for (let k = 0; k < off.length; k++) {
           const a = alpha[k];
           pixels[base + off[k]] =
-            BLACK |
-            (((b8 * a) >> 8) << 16) |
-            (((g8 * a) >> 8) << 8) |
-            ((r8 * a) >> 8);
+            glyphPixel(r8, g8, b8, a);
         }
       }
 
@@ -1157,7 +1161,7 @@ export function createTreeRenderer(canvas, options = {}) {
 
         cellZ.fill(-Infinity);
         cellIdx.fill(-1);
-        pixels.fill(BLACK);
+        pixels.fill(background);
 
         // 1. project every visible point; the nearest one wins its cell
         for (let i = 0, i3 = 0; i < count; i++, i3 += 3) {
@@ -1385,10 +1389,7 @@ export function createTreeRenderer(canvas, options = {}) {
           for (let k = 0; k < off.length; k++) {
             const a = alpha[k];
             pixels[base + off[k]] =
-              BLACK |
-              (((b8 * a) >> 8) << 16) |
-              (((g8 * a) >> 8) << 8) |
-              ((r8 * a) >> 8);
+              glyphPixel(r8, g8, b8, a);
           }
           letters++;
         }

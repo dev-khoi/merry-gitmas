@@ -47,16 +47,17 @@ export async function exportTree(input: Snapshot, options: ExportOptions): Promi
       await document.fonts.load('12px "JetBrains Mono"');
       await document.fonts.load('bold 12px "JetBrains Mono"');
       await document.fonts.ready;
-      const win = window as unknown as { MerryGitmas: { mount(canvas: HTMLCanvasElement, state: TreeState): { draw(time: number): void } }; scene: { draw(time: number): void } };
-      win.scene = win.MerryGitmas.mount(document.querySelector('canvas')!, state);
+      const win = window as unknown as { MerryGitmas: { mount(canvas: HTMLCanvasElement, state: TreeState, options?: { transparent?: boolean }): { draw(time: number): void } }; scene: { draw(time: number): void } };
+      win.scene = win.MerryGitmas.mount(document.querySelector('canvas')!, state, { transparent: true });
       win.scene.draw(0);
     }, state);
-    await page.locator('canvas').screenshot({ path: path.join(out, 'tree.png') });
+    await page.locator('canvas').screenshot({ path: path.join(out, 'tree.png'), omitBackground: true });
     if (!options.still) {
       const gif = GIFEncoder();
       const frames = 24 * fps;
       let palette: number[][] | undefined;
-      let previous: Uint8Array | undefined;
+      // Fixed ordered alpha dithering preserves soft glows with GIF's 1-bit alpha.
+      const alphaThresholds = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
       for (let frame = 0; frame < frames; frame++) {
         const encoded = await page.evaluate(time => {
           (window as unknown as { scene: { draw(time: number): void } }).scene.draw(time);
@@ -69,21 +70,20 @@ export async function exportTree(input: Snapshot, options: ExportOptions): Promi
         const rgba = new Uint8Array(Buffer.from(encoded, 'base64'));
         palette ??= quantize(rgba, 127, { format: 'rgb444' });
         const indexed = applyPalette(rgba, palette, 'rgb444');
-        const transparentIndex = palette.length;
-        const delta = indexed.slice();
-        if (previous) {
-          for (let i = 0; i < delta.length; i++) if (indexed[i] === previous[i]) delta[i] = transparentIndex;
+        // Index zero is both the logical background and every frame's transparent color.
+        for (let i = 0; i < indexed.length; i++) {
+          const x = i % width;
+          const y = Math.floor(i / width);
+          const threshold = (alphaThresholds[(y % 4) * 4 + x % 4] + 0.5) * 16;
+          indexed[i] = rgba[i * 4 + 3] > threshold ? indexed[i] + 1 : 0;
         }
         // GIF time uses centiseconds: distribute rounding, preserving 24s total.
         const delay = (Math.round((frame + 1) * 100 / fps) - Math.round(frame * 100 / fps)) * 10;
-        // Keep the previous composited frame, and encode unchanged pixels as
-        // transparent runs. This preserves the static sky and avoids palette
-        // flicker while substantially shrinking README animations.
-        gif.writeFrame(delta, width, height, {
-          palette: frame === 0 ? [...palette, [0, 0, 0]] : undefined,
-          delay, repeat: 0, transparent: frame > 0, transparentIndex, dispose: 1,
+        // Clear complete frames between draws so moving objects never leave trails.
+        gif.writeFrame(indexed, width, height, {
+          palette: frame === 0 ? [[0, 0, 0], ...palette] : undefined,
+          delay, repeat: 0, transparent: true, transparentIndex: 0, dispose: 2,
         });
-        previous = indexed;
         if (frame % fps === 0) process.stdout.write(`\rRendering ${Math.floor(frame / fps) + 1}/24 seconds…`);
       }
       gif.finish();

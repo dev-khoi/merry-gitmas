@@ -68,6 +68,8 @@ Contributions are **GitHub-visible calendar counts**, not a commits-only metric.
 
 ## Generated files
 
+GIF and PNG exports have transparent backgrounds, including behind the captions. GIF glows use ordered alpha dithering because GIF supports only fully opaque or fully transparent pixels; PNG preserves smooth transparency. GIF frames clear between draws to prevent motion trails. The interactive preview retains its dark presentation.
+
 | File | Purpose |
 | --- | --- |
 | `tree.gif` | Looping README artwork |

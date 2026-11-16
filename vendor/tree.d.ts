@@ -5,6 +5,7 @@ export function createTreeRenderer(canvas: HTMLCanvasElement, options?: {
   state?: TreeState;
   fontFamily?: string;
   bottomPadding?: number;
+  transparent?: boolean;
 }): {
   draw(seconds: number, buildProgress?: number, dt?: number): void;
   counts: Record<string, number>;
