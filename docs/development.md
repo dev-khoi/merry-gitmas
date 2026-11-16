@@ -79,6 +79,8 @@ Default-branch runs commit outputs into `gitmas/`. Other branches upload an arti
 
 The workflow uses the built-in GitHub token. It writes to this repository, not to `dev-khoi/dev-khoi`. Install the profile workflow separately if you want nightly updates there too.
 
+Publishing fetches full history, rebases its generated-file commit onto the latest remote branch, and retries the push up to three times. This handles other workflows or edits pushing while the tree renders. If an older workflow fails with `fetch first` or `non-fast-forward`, replace it with the current example and start a new run; rerunning the failed job alone still uses its older workflow definition. A rebase conflict needs to be resolved rather than force-pushing over remote changes.
+
 ### Reusable action
 
 The [profile workflow](../examples/profile-workflow.yml) uses `dev-khoi/merry-gitmas@main`. You can pin a published tag or commit instead. It starts when its workflow file is pushed, runs nightly, and can be triggered manually.
