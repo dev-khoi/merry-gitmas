@@ -4,7 +4,7 @@ export function createPreview(state: TreeState, bundle: string, fontBase64: stri
   const serialized = JSON.stringify(state).replace(/</g, '\\u003c');
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark"><title>Merry Gitmas · ${state.login}</title>
+<meta name="color-scheme" content="dark light"><title>Merry Gitmas · ${state.login}</title>
 <style>
 @font-face { font-family: 'JetBrains Mono'; src: url(data:font/woff2;base64,${fontBase64}) format('woff2'); font-weight: 400; font-display: block; }
 @font-face { font-family: 'JetBrains Mono'; src: url(data:font/woff2;base64,${boldFontBase64}) format('woff2'); font-weight: 700; font-display: block; }
@@ -22,6 +22,14 @@ p { color: #8a97ab; margin: 8px 0; font-size: 10px; }
 .language::before { content: '● '; color: var(--color); }
 a { color: #a3c6e8; }
 @media (prefers-reduced-motion: reduce) { canvas { box-shadow: 0 0 0 1px #ffffff10; } }
+@media (prefers-color-scheme: light) {
+  body { background: #f6f8fa; color: #24292f; }
+  canvas { background: #fff; box-shadow: 0 0 0 1px #d0d7de, 0 12px 40px #0001; }
+  h1 { color: #7a4d00; }
+  button { background: #fff; border-color: #afb8c1; color: #24292f; }
+  p { color: #57606a; }
+  a { color: #0969da; }
+}
 </style></head><body><main>
 <h1>MERRY GITMAS</h1>
 <canvas id="tree" width="${width}" height="${height}" role="img" aria-label="${state.login}'s ${state.year} ASCII Christmas tree: ${state.contributions} contributions, ${state.activeWeeks} active weeks"></canvas>
@@ -44,9 +52,14 @@ for (const language of state.languages) {
   document.getElementById('legend').append(item);
 }
 Promise.all([document.fonts.load('12px "JetBrains Mono"'), document.fonts.load('bold 12px "JetBrains Mono"')]).then(() => document.fonts.ready).then(() => {
-  const scene = MerryGitmas.mount(canvas, state);
+  const colorScheme = matchMedia('(prefers-color-scheme: light)');
+  let scene = MerryGitmas.mount(canvas, state, { theme: colorScheme.matches ? 'light' : 'dark' });
   let playing = !matchMedia('(prefers-reduced-motion: reduce)').matches;
   let seconds = 0, previous;
+  colorScheme.addEventListener('change', () => {
+    scene = MerryGitmas.mount(canvas, state, { theme: colorScheme.matches ? 'light' : 'dark' });
+    scene.draw(seconds);
+  });
   function updateButton() { pause.textContent = playing ? 'Pause' : 'Play'; pause.setAttribute('aria-pressed', String(!playing)); }
   updateButton();
   pause.addEventListener('click', () => { playing = !playing; previous = undefined; updateButton(); });

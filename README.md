@@ -2,7 +2,11 @@
 
 Turn your GitHub activity into a rotating ASCII Christmas tree, with language-colored gifts, weekly lights, falling snow, and a glowing star.
 
-<img src="gitmas/tree.gif" width="420" alt="dev-khoi's Merry Gitmas tree" />
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="gitmas/tree.gif" />
+  <source media="(prefers-color-scheme: light)" srcset="gitmas/tree-light.gif" />
+  <img src="gitmas/tree-light.gif" width="420" alt="dev-khoi's Merry Gitmas tree" />
+</picture>
 
 ## How to set up your own GITMAS tree
 
@@ -13,8 +17,14 @@ Set this up once in your **profile repository**: the repository named exactly yo
 3. Add this to your profile `README.md`:
 
    ```html
-   <img src="gitmas/tree.gif" width="420" alt="My Merry Gitmas tree" />
+   <picture>
+     <source media="(prefers-color-scheme: dark)" srcset="gitmas/tree.gif" />
+     <source media="(prefers-color-scheme: light)" srcset="gitmas/tree-light.gif" />
+     <img src="gitmas/tree-light.gif" width="420" alt="My Merry Gitmas tree" />
+   </picture>
    ```
+
+The image switches automatically with the viewer's theme. If you already use an older workflow, update its commit step to include `tree-light.gif` and `tree-light.png` as shown in the example.
 
 ## What shapes the tree?
 
@@ -29,12 +39,12 @@ Set this up once in your **profile repository**: the repository named exactly yo
 
 Contributions include the activity GitHub exposes to the workflow token, not just commits. Language shares count repositories by their primary language; they are not a measure of coding time. The current year includes completed days through yesterday UTC. You can also choose a past year.
 
-GIF and PNG backgrounds are transparent. GIF glows use fine dithering; PNG preserves smooth transparency. The HTML preview has a dark background and works offline.
+GIF and PNG backgrounds are transparent. Dark-mode artwork keeps its bright glow; light-mode artwork uses deeper colors, darker text, and subtler glow and ground effects. GIF glows use fine dithering; PNG preserves smooth transparency. The offline HTML preview follows your browser's light or dark theme.
 
 ## Files and advanced options
 
-- `tree.gif` — animated image for your README.
-- `tree.png` — still image.
+- `tree.gif` / `tree.png` — dark-mode animation and still image.
+- `tree-light.gif` / `tree-light.png` — light-mode animation and still image.
 - `preview.html` — interactive preview with pause and scrubbing controls.
 - `snapshot.json` — saved GitHub data that can be rendered again without fetching.
 - `tree-state.json` — calculated appearance settings.

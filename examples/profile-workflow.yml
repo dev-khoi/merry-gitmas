@@ -28,7 +28,7 @@ jobs:
       - name: Publish generated artwork
         shell: bash
         run: |
-          git add -- gitmas/tree.gif gitmas/tree.png gitmas/preview.html gitmas/snapshot.json gitmas/tree-state.json gitmas/FONT-LICENSE.txt
+          git add -- gitmas/tree.gif gitmas/tree.png gitmas/tree-light.gif gitmas/tree-light.png gitmas/preview.html gitmas/snapshot.json gitmas/tree-state.json gitmas/FONT-LICENSE.txt
           if git diff --cached --quiet; then exit 0; fi
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Decorate my Gitmas tree'
           git push

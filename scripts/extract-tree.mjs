@@ -27,6 +27,7 @@ config = replace(config, 'new URLSearchParams(location.search)', 'new URLSearchP
 config += `
       OPT.spin = options.reference ? OPT.spin : 24;
       OPT.hud = false;
+      const lightTheme = options.theme === 'light' && !options.reference;
       const frequency = (rate) => options.reference ? rate :
         TAU / 24 * Math.max(1, Math.round(rate * 24 / TAU));
 `;
@@ -68,12 +69,23 @@ setup = replace(setup,
 setup = replace(setup, '        fwSprites = FW_COLORS.map((c) => makeGlow(c, scale * 0.6));\n        fwGlyphs = Array.from(FW_RAMP, getGlyph);\n', '');
 setup = replace(setup, 'const BLACK = 0xff000000;', `const BLACK = 0xff000000;
       const background = options.transparent && !options.reference ? 0 : BLACK;
-      function glyphPixel(r, g, b, a) {
+      function glyphPixel(r, g, b, a, kind) {
+        if (lightTheme) {
+          const tone = kind === FLAKE ? 0.6 : 0.68;
+          r *= tone; g *= tone; b *= tone;
+          a = Math.round(a * (kind === GROUND ? 0.16 : kind === FLAKE ? 0.6 : 1));
+        }
         if (options.transparent && !options.reference) {
           return (a << 24) | ((b | 0) << 16) | ((g | 0) << 8) | (r | 0);
         }
         return BLACK | (((b * a) >> 8) << 16) | (((g * a) >> 8) << 8) | ((r * a) >> 8);
       }`);
+setup = replace(setup, 'const [r, gr, b] = color.map((v) => Math.round(v * 255));',
+  'const [r, gr, b] = color.map((v) => Math.round(v * 255 * (lightTheme ? 0.68 : 1)));');
+setup = replace(setup, 'grad.addColorStop(0, `rgba(${r},${gr},${b},0.55)`);',
+  'grad.addColorStop(0, `rgba(${r},${gr},${b},${lightTheme ? 0.16 : 0.55})`);');
+setup = replace(setup, 'grad.addColorStop(0.35, `rgba(${r},${gr},${b},0.16)`);',
+  'grad.addColorStop(0.35, `rgba(${r},${gr},${b},${lightTheme ? 0.025 : 0.16})`);');
 setup = replace(setup, 'Math.min(3000, Math.max(380, 2 * halfW * (top - bottom) * 34))',
   'Math.min(3000, Math.max(380, 2 * halfW * (top - bottom) * 34)) * (options.reference ? 1 : 0.25)');
 
@@ -114,7 +126,7 @@ frame = replace(frame, 'pixels.fill(BLACK);', 'pixels.fill(background);');
 frame = replace(frame, `BLACK |
               (((b8 * a) >> 8) << 16) |
               (((g8 * a) >> 8) << 8) |
-              ((r8 * a) >> 8)`, 'glyphPixel(r8, g8, b8, a)');
+              ((r8 * a) >> 8)`, 'glyphPixel(r8, g8, b8, a, kind)');
 frame = replace(frame, '        const invCW = 1 / cellW,', `        const giftTheta = theta * giftCycles;
         const giftCos = Math.cos(giftTheta), giftSin = Math.sin(giftTheta);
         const invCW = 1 / cellW,`);

@@ -28,6 +28,12 @@ outputs:
   png:
     description: Path to the generated still image, relative to the caller's workspace.
     value: ${{ inputs.output-dir }}/tree.png
+  gif-light:
+    description: Path to the transparent GIF optimized for light backgrounds.
+    value: ${{ inputs.output-dir }}/tree-light.gif
+  png-light:
+    description: Path to the transparent PNG optimized for light backgrounds.
+    value: ${{ inputs.output-dir }}/tree-light.png
   preview:
     description: Path to the self-contained interactive HTML preview.
     value: ${{ inputs.output-dir }}/preview.html

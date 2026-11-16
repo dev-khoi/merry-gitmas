@@ -2,7 +2,7 @@ import { createTreeRenderer } from '../vendor/tree.js';
 import type { TreeState } from './tree-state.js';
 export { createTreeRenderer };
 
-export function mount(canvas: HTMLCanvasElement, state: TreeState, options: { transparent?: boolean } = {}) {
+export function mount(canvas: HTMLCanvasElement, state: TreeState, options: { transparent?: boolean; theme?: 'dark' | 'light' } = {}) {
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) throw new Error('Canvas 2D is unavailable.');
   const treeCanvas = document.createElement('canvas');
@@ -11,7 +11,8 @@ export function mount(canvas: HTMLCanvasElement, state: TreeState, options: { tr
   treeCanvas.height = canvas.height - footer;
   const bottomPadding = Math.min(48, treeCanvas.height * 0.1);
   const layoutHeight = treeCanvas.height - bottomPadding;
-  const tree = createTreeRenderer(treeCanvas, { seed: state.seed, state, fontFamily: '"JetBrains Mono", monospace', bottomPadding, transparent: options.transparent });
+  const light = options.theme === 'light';
+  const tree = createTreeRenderer(treeCanvas, { seed: state.seed, state, fontFamily: '"JetBrains Mono", monospace', bottomPadding, transparent: options.transparent || light, theme: options.theme });
   // Bottom-anchor the crop so the spare sky is removed rather than the gifts.
   const zoom = 1.2;
   const cropWidth = treeCanvas.width / zoom;
@@ -30,7 +31,7 @@ export function mount(canvas: HTMLCanvasElement, state: TreeState, options: { tr
     text!.textBaseline = 'middle';
     text!.lineJoin = 'round';
     text!.lineWidth = 2.5;
-    text!.strokeStyle = '#0d1117';
+    text!.strokeStyle = light ? '#ffffff' : '#0d1117';
     text!.fillStyle = color;
     text!.strokeText(value, Math.round(x), Math.round(y), canvas.width - 28);
     text!.fillText(value, Math.round(x), Math.round(y), canvas.width - 28);
@@ -38,10 +39,14 @@ export function mount(canvas: HTMLCanvasElement, state: TreeState, options: { tr
   function draw(seconds: number, buildProgress = 1, crispText = false) {
     tree.draw(seconds, buildProgress);
     ctx!.clearRect(0, 0, canvas.width, canvas.height);
+    if (light && !options.transparent) {
+      ctx!.fillStyle = '#ffffff';
+      ctx!.fillRect(0, 0, canvas.width, canvas.height);
+    }
     ctx!.imageSmoothingEnabled = false;
     ctx!.drawImage(treeCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, treeCanvas.width, treeCanvas.height);
     if (!options.transparent) {
-      ctx!.fillStyle = '#080e1b';
+      ctx!.fillStyle = light ? '#ffffff' : '#080e1b';
       ctx!.fillRect(0, treeCanvas.height, canvas.width, footer);
     }
     text!.clearRect(0, 0, canvas.width, canvas.height);
@@ -59,11 +64,18 @@ export function mount(canvas: HTMLCanvasElement, state: TreeState, options: { tr
         }
       }
       placed.push({ x, y, width });
-      label(gift.text, x, y, languageSize, gift.color);
+      let color = gift.color;
+      if (light) {
+        const channels = [1, 3, 5].map(offset => parseInt(color.slice(offset, offset + 2), 16));
+        const luminance = channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+        const tone = Math.min(1, 100 / Math.max(1, luminance));
+        color = `rgb(${channels.map(value => Math.round(value * tone)).join(',')})`;
+      }
+      label(gift.text, x, y, languageSize, color);
     }
-    label('made by dev-khoi', Math.max(16, canvas.width * 0.05), Math.max(22, canvas.width * 0.06), Math.max(11, Math.round(canvas.width * 0.029)), '#e1b494', 'left');
-    label(`@${state.login} · ${state.year}${state.demo ? ' · DEMO' : ''}`, canvas.width / 2, treeCanvas.height + footer * 0.32, Math.max(13, Math.round(canvas.width * 0.036)), '#e0b34d');
-    label(`${state.contributions.toLocaleString('en-US')} contributions · ${state.activeWeeks} active weeks`, canvas.width / 2, treeCanvas.height + footer * 0.7, Math.max(11, Math.round(canvas.width * 0.029)), '#cbd5e1');
+    label('made by dev-khoi', Math.max(16, canvas.width * 0.05), Math.max(22, canvas.width * 0.06), Math.max(11, Math.round(canvas.width * 0.029)), light ? '#62402d' : '#e1b494', 'left');
+    label(`@${state.login} · ${state.year}${state.demo ? ' · DEMO' : ''}`, canvas.width / 2, treeCanvas.height + footer * 0.32, Math.max(13, Math.round(canvas.width * 0.036)), light ? '#7a4d00' : '#e0b34d');
+    label(`${state.contributions.toLocaleString('en-US')} contributions · ${state.activeWeeks} active weeks`, canvas.width / 2, treeCanvas.height + footer * 0.7, Math.max(11, Math.round(canvas.width * 0.029)), light ? '#334155' : '#cbd5e1');
     if (crispText) {
       // Keep text opaque in GIFs; only glows should use dotted alpha dithering.
       const image = text!.getImageData(0, 0, canvas.width, canvas.height);

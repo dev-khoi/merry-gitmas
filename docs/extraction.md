@@ -35,7 +35,7 @@ The extraction checks each replacement anchor and fails if the source no longer 
 - Recent activity strengthens the star aura. Its size is capped at 1.7× the base glow sprite.
 - Snowfall uses one quarter of the source flake count. Rotation, snowfall, and pulsing effects loop over 24 seconds and can be rendered in any frame order.
 - Exports use bundled regular and bold JetBrains Mono fonts.
-- GIF and PNG exports use transparent canvases. GIF encoding dithers alpha and clears each frame to prevent trails; the HTML preview retains its dark background.
+- GIF and PNG exports use transparent canvases. GIF encoding dithers alpha and clears each frame to prevent trails. Light-mode variants use deeper glyph colors, subdued glow, and lighter ground coverage. The HTML preview follows the browser's color scheme.
 
 The growth formulas live in `src/tree-state.ts`; framing and captions live in `src/scene.ts`.
 

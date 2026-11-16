@@ -91,7 +91,9 @@ The [profile workflow](../examples/profile-workflow.yml) uses `dev-khoi/merry-gi
 | `token` | Built-in GitHub token |
 | `fps` | `10` |
 
-The action generates files; the calling workflow commits them. Its outputs are `gif`, `png`, and `preview` paths. Use `ubuntu-latest`; the action installs Node.js and Chromium dependencies.
+Every export generates both themes: `tree.gif` and `tree.png` for dark backgrounds, plus `tree-light.gif` and `tree-light.png` for light backgrounds. Both GIFs share the same timing. Use the README's `<picture>` embed to select automatically. `--still` generates both PNGs without GIFs.
+
+The action generates files; the calling workflow commits them. Its outputs are `gif`, `png`, `gif-light`, `png-light`, and `preview` paths. Existing profile workflows need to add the two light-mode files to their commit step; see the updated example. Use `ubuntu-latest`; the action installs Node.js and Chromium dependencies.
 
 ## Source layout
 

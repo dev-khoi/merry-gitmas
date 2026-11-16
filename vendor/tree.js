@@ -38,6 +38,7 @@ export function createTreeRenderer(canvas, options = {}) {
 
       OPT.spin = options.reference ? OPT.spin : 24;
       OPT.hud = false;
+      const lightTheme = options.theme === 'light' && !options.reference;
       const frequency = (rate) => options.reference ? rate :
         TAU / 24 * Math.max(1, Math.round(rate * 24 / TAU));
 
@@ -643,7 +644,12 @@ export function createTreeRenderer(canvas, options = {}) {
 
       const BLACK = 0xff000000;
       const background = options.transparent && !options.reference ? 0 : BLACK;
-      function glyphPixel(r, g, b, a) {
+      function glyphPixel(r, g, b, a, kind) {
+        if (lightTheme) {
+          const tone = kind === FLAKE ? 0.6 : 0.68;
+          r *= tone; g *= tone; b *= tone;
+          a = Math.round(a * (kind === GROUND ? 0.16 : kind === FLAKE ? 0.6 : 1));
+        }
         if (options.transparent && !options.reference) {
           return (a << 24) | ((b | 0) << 16) | ((g | 0) << 8) | (r | 0);
         }
@@ -706,7 +712,7 @@ export function createTreeRenderer(canvas, options = {}) {
         const sprite = document.createElement("canvas");
         sprite.width = sprite.height = size;
         const g = sprite.getContext("2d");
-        const [r, gr, b] = color.map((v) => Math.round(v * 255));
+        const [r, gr, b] = color.map((v) => Math.round(v * 255 * (lightTheme ? 0.68 : 1)));
         const grad = g.createRadialGradient(
           size / 2,
           size / 2,
@@ -715,8 +721,8 @@ export function createTreeRenderer(canvas, options = {}) {
           size / 2,
           size / 2,
         );
-        grad.addColorStop(0, `rgba(${r},${gr},${b},0.55)`);
-        grad.addColorStop(0.35, `rgba(${r},${gr},${b},0.16)`);
+        grad.addColorStop(0, `rgba(${r},${gr},${b},${lightTheme ? 0.16 : 0.55})`);
+        grad.addColorStop(0.35, `rgba(${r},${gr},${b},${lightTheme ? 0.025 : 0.16})`);
         grad.addColorStop(1, `rgba(${r},${gr},${b},0)`);
         g.fillStyle = grad;
         g.fillRect(0, 0, size, size);
@@ -1397,7 +1403,7 @@ export function createTreeRenderer(canvas, options = {}) {
           for (let k = 0; k < off.length; k++) {
             const a = alpha[k];
             pixels[base + off[k]] =
-              glyphPixel(r8, g8, b8, a);
+              glyphPixel(r8, g8, b8, a, kind);
           }
           letters++;
         }
