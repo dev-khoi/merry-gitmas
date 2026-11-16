@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/NawaMayumi/ascii-christmas-tree",
+  "file": "index.html",
+  "renderer": "character-grid-z-buffer",
+  "customized": true,
+  "sha256": "74fa5560b607829b55929690e8f67be7a9e46cfe155c9453c7853e84baddd192"
+}

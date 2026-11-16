@@ -1,0 +1,65 @@
+name: Merry Gitmas
+description: Turn a GitHub year into a rotating ASCII Christmas tree, GIF, PNG, and offline preview.
+branding:
+  icon: gift
+  color: green
+
+inputs:
+  login:
+    description: GitHub account to decorate a tree for.
+    default: ${{ github.repository_owner }}
+  year:
+    description: Calendar year; leave empty for the current UTC year.
+    default: ''
+  output-dir:
+    description: Destination relative to the caller's workspace.
+    default: gitmas
+  token:
+    description: Token for GitHub collection. The built-in token works for public account data.
+    default: ${{ github.token }}
+  fps:
+    description: GIF frames per second (1–30).
+    default: '10'
+
+outputs:
+  gif:
+    description: Path to the generated GIF, relative to the caller's workspace.
+    value: ${{ inputs.output-dir }}/tree.gif
+  png:
+    description: Path to the generated still image, relative to the caller's workspace.
+    value: ${{ inputs.output-dir }}/tree.png
+  preview:
+    description: Path to the self-contained interactive HTML preview.
+    value: ${{ inputs.output-dir }}/preview.html
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - name: Install Merry Gitmas
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npm ci
+    - name: Install Chromium
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npx playwright install --with-deps chromium
+    - name: Build the extracted renderer
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npm run build
+    - name: Decorate the tree
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        GITMAS_LOGIN: ${{ inputs.login }}
+        GITMAS_YEAR: ${{ inputs.year }}
+        GITMAS_OUTPUT: ${{ inputs.output-dir }}
+        GITMAS_FPS: ${{ inputs.fps }}
+      run: |
+        args=(generate "$GITMAS_LOGIN" --output-dir "$GITMAS_OUTPUT" --fps "$GITMAS_FPS")
+        if [[ -n "$GITMAS_YEAR" ]]; then args+=(--year "$GITMAS_YEAR"); fi
+        node "$GITHUB_ACTION_PATH/dist/cli.js" "${args[@]}"
