@@ -29,7 +29,7 @@ test('earliest longest streak wins; zero activity still produces an attractive t
   const state = deriveTreeState(snapshot);
   assert.equal(state.longestStreak, 0);
   assert.equal(state.scale, 0.7);
-  assert.ok(state.fullness > 0.5);
+  assert.equal(state.fullness, 0.5);
   for (const date of ['2026-01-05', '2026-01-12', '2026-02-02', '2026-02-09']) snapshot.days.find(day => day.date === date)!.count = 1;
   const active = deriveTreeState(snapshot);
   assert.equal(active.longestStreak, 2);

@@ -53,13 +53,13 @@ Defaults: 380 × 544 pixels, 10 fps, a seamless 24-second rotation **including t
 
 | Data | Appearance |
 | --- | --- |
-| Selected year's contributions | Tree scale and needle fullness, with diminishing returns |
-| Primary languages of current public, non-fork owned repositories | Ornament colors, weighted by repository count |
-| Top five languages | Name tags on the source scene's five gifts |
+| Selected year's contributions | Tree scale, branch reach, and strongly varying needle fullness; fully grown at 5,000 contributions |
+| Top six primary languages of current public, non-fork owned repositories | Larger, brighter ornament colors, weighted by repository count within the selected languages |
+| Up to six languages | One matching colored gift and label per language; fewer gifts orbit faster (two gifts make three revolutions per 24 seconds) |
 | Each Monday-based week touching the year | One spiral light, chronological from bottom to top |
 | Active weeks | Mint lights |
 | Earliest longest run of active weeks | Gold lights |
-| Last seven observed days | Weekly-light twinkle intensity |
+| Last seven observed days | Stronger, more expansive pulsing star aura and weekly-light twinkle; maximum activity effect at 100 contributions |
 | Stable account identity | Repeatable original-style branch and ornament arrangement |
 
 Calendar years touch **53 weeks, occasionally 54**, rather than exactly 52. Counts only include days inside the selected year. Quiet and future weeks stay dim. The star is always present, and zero-activity accounts still get a healthy little tree.
@@ -100,6 +100,7 @@ npm run check
 npm test
 npm run build
 npm run test:visual
+npx tsx tests/appearance.ts
 npm run demo
 npm run test:exports
 ```

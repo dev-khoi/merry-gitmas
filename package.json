@@ -14,6 +14,7 @@
     "test:visual": "tsx tests/visual.ts",
     "test:exports": "tsx tests/exports.ts",
     "demo": "tsx src/cli.ts demo",
+    "generate:examples": "node scripts/generate-examples.mjs",
     "start": "tsx src/cli.ts"
   },
   "dependencies": {

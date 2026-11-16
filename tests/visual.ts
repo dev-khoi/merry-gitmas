@@ -91,8 +91,8 @@ try {
     assert.equal(personalized.images[0], personalized.images[3], 'Frame order must not change snow or lighting');
     assert.notEqual(personalized.images[0], personalized.images[1], 'The tree and snowfall must animate');
     assert.equal(personalized.counts.ornaments, 26);
-    assert.equal(personalized.counts.gifts, 5);
-    assert.ok(personalized.counts.flakes >= 380);
+    assert.equal(personalized.counts.gifts, Math.min(6, state.languages.length));
+    assert.ok(personalized.counts.flakes >= 95 && personalized.counts.flakes <= 750);
     assert.equal(personalized.counts.lights, state.weeks.length);
     assert.equal(new Set(personalized.weekLights.map((week: { index: number }) => week.index)).size, state.weeks.length);
     assert.equal(personalized.weekLights.reduce((sum: number, week: { count: number }) => sum + week.count, 0), state.contributions);

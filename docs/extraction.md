@@ -48,15 +48,16 @@ The source's editor, code typing, fullscreen control, HUD, page lifecycle, anima
 ### GitHub personalization
 
 - Account identity seeds the original geometry builder.
-- Contributions control scene scale and a deterministic thinning mask over original needles/snowcaps. The mask is bypassed in reference mode.
+- Contributions control scene scale, branch reach, trunk thickness, and a deterministic thinning mask over needles/snowcaps. Fullness rises from 50% to 100% at 5,000 contributions; thinning uses the square of fullness to make changes visible at export resolution. Trunk radius grows from 1.175× to 1.6× the source radius as fullness increases. These changes are bypassed in reference mode.
 - Each bauble's surface points receive a language color together. Its original sphere geometry, surface normals, shading, and specular highlights remain intact.
 - The source light spiral supplies one existing bulb for each Monday-based week touching the selected year (53, occasionally 54). Unselected source bulbs are hidden. The selected bulbs use mint for active weeks, gold for the earliest longest streak, and dim blue-gray for quiet/upcoming weeks.
-- Gift labels use up to five language names instead of the source's personal family-name defaults.
+- Personalized ornaments are 1.25× the source size with a modest brightness lift, using the top six languages. Up to six gifts use the same language colors for their boxes and labels. Gift rotation completes `ceil(6 / giftCount)` whole revolutions per 24-second loop, independently of tree rotation.
 
 ### Deterministic animation and fonts
 
 - Personalized rotation, snow, wind, light twinkle, tinsel shimmer, and star pulsation complete whole cycles in 24 seconds.
 - Personalized snow positions are calculated from absolute time, rather than accumulating `dt`. Flakes traverse whole vertical spans per loop; front and back layers retain the source's depth differences. Rendering out of order or scrubbing produces the same frame.
+- Personalized snowfall has one quarter of the source's flake count. Recent contributions expand and intensify the star's pulsing aura, reaching the maximum effect at 100 contributions over the last seven observed days.
 - Exports and the offline preview use bundled regular and bold JetBrains Mono fonts. Both faces load before the one-time glyph rasterization. Reference comparisons use the original native font stack on both sides and do not replace the source's glyphs.
 
 ## How fidelity is verified
@@ -70,7 +71,7 @@ For 420 × 457 portrait and 960 × 640 landscape canvases, it verifies:
 - Every RGBA pixel matches at 0, 3.5, 7, 12, and 19 seconds, including partial growth, lighting, gifts, and snowfall advanced using matching explicit time steps.
 - Personalized frames at 0 and 24 seconds are identical, including snowfall and glows.
 - Rendering out of order produces the same frame, while different times animate the scene.
-- There are 26 baubles, five gifts, dense snowfall, and exactly one unique selected bulb per weekly bucket.
+- There are 26 baubles, up to six language gifts, reduced snowfall, and exactly one unique selected bulb per weekly bucket.
 - Weekly-light counts sum to the snapshot contribution total.
 - The browser bundle contains no Santa/reindeer or firework drawing routines.
 

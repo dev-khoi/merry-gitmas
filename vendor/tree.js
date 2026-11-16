@@ -253,6 +253,7 @@ export function createTreeRenderer(canvas, options = {}) {
         }
 
         // --- trunk: a cylinder with bark stripes
+        const trunkRadius = 0.085 * (options.reference ? 1 : 0.75 + 0.85 * (options.state?.fullness ?? 1));
         obj = 2;
         for (let i = 0; i < 50; i++) {
           const h = (0.62 * i) / 49;
@@ -260,9 +261,9 @@ export function createTreeRenderer(canvas, options = {}) {
             const a = (TAU * j) / 40;
             const bark = 0.75 + 0.25 * Math.sin(h * 90 + a * 3);
             add(
-              0.085 * Math.cos(a),
+              trunkRadius * Math.cos(a),
               h,
-              0.085 * Math.sin(a),
+              trunkRadius * Math.sin(a),
               Math.cos(a),
               0,
               Math.sin(a),
@@ -322,7 +323,7 @@ export function createTreeRenderer(canvas, options = {}) {
           const cx = r * Math.cos(a),
             cz = r * Math.sin(a);
           const cy = y - 0.22 * r * r + 0.07 * r - 0.05;
-          const rad = rng.range(0.05, 0.07) * (0.8 + 0.4 * (1 - u));
+          const rad = rng.range(0.05, 0.07) * (0.8 + 0.4 * (1 - u)) * (options.reference ? 1 : 1.25);
           const col = ballColors[i % ballColors.length];
           const t0 = T_BALLS + rng.u() * 1.4;
           obj = 10 + i;
@@ -472,6 +473,16 @@ export function createTreeRenderer(canvas, options = {}) {
             rib: [1.0, 0.85, 0.4],
           },
         ];
+        if (!options.reference && options.state) {
+          const languages = options.state.languages.slice(0, 6);
+          const templates = gifts.slice();
+          gifts.splice(0, gifts.length, ...languages.map((language, index) => ({
+            ...templates[index % templates.length],
+            ang: 0.5 + index * TAU / languages.length,
+            col: [1, 3, 5].map(offset => parseInt(language.color.slice(offset, offset + 2), 16) / 255),
+            rib: [0.95, 0.95, 1],
+          })));
+        }
         const bow = fibSphere(400);
         const DENSITY = 36000; // points per unit area (dense: clean edges)
         const RIB = 0.035; // ribbon half-width
@@ -578,14 +589,18 @@ export function createTreeRenderer(canvas, options = {}) {
 
 
       const scene = buildScene();
+      // Whole revolutions preserve the seamless 24-second export loop.
+      const giftCycles = options.reference ? 1 : Math.max(1, Math.ceil(6 / Math.max(1, scene.gifts.length)));
       const weeklyLights = new Map();
       if (!options.reference && options.state) {
         const state = options.state;
+        const languages = state.languages.slice(0, 6);
+        const languageShare = languages.reduce((sum, language) => sum + language.share, 0);
         const color = (hex) => [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16) / 255);
         const languageFor = (index) => {
-          const target = (index * 0.61803398875) % 1;
+          const target = ((index * 0.61803398875) % 1) * languageShare;
           let total = 0;
-          return state.languages.find(language => { total += language.share; return target < total; }) ?? state.languages.at(-1);
+          return languages.find(language => { total += language.share; return target < total; }) ?? languages.at(-1);
         };
         // Recolor every surface point of a bauble together, preserving its
         // sphere geometry, normals, original shading, and specular highlights.
@@ -607,7 +622,7 @@ export function createTreeRenderer(canvas, options = {}) {
           weeklyLights.set(light.index, week);
           return { index: light.index, color: paletteIndex };
         });
-        CONFIG.gifts = state.languages.slice(0, 5).map(language => language.name);
+        CONFIG.gifts = state.languages.slice(0, 6).map(language => language.name);
       }
 
       // Camera: orbiting is done by rotating the tree; the camera only pitches down.
@@ -774,7 +789,7 @@ export function createTreeRenderer(canvas, options = {}) {
         const top = (centerY / scale) * 1.45;
         const bottom = -((heightPx - centerY) / scale) * 1.45;
         const count = Math.round(
-          Math.min(3000, Math.max(380, 2 * halfW * (top - bottom) * 34)),
+          Math.min(3000, Math.max(380, 2 * halfW * (top - bottom) * 34)) * (options.reference ? 1 : 0.25),
         );
         flakes = {
           count,
@@ -1088,11 +1103,14 @@ export function createTreeRenderer(canvas, options = {}) {
         }
 
         // gift tags: a name under each gift while it faces the viewer
+        const giftAngle = options.reference ? 0 : tAbs * TAU / 24 * (giftCycles - 1);
+        const giftCos = Math.cos(Math.atan2(sinT, cosT) + giftAngle);
+        const giftSin = Math.sin(Math.atan2(sinT, cosT) + giftAngle);
         scene.gifts.forEach((gift, gi) => {
           const name = (CONFIG.gifts[gi] || "").trim();
           if (!name || t < gift.t0 + 1.0) return;
-          const xr = gift.x * cosT + gift.z * sinT;
-          const zr = -gift.x * sinT + gift.z * cosT;
+          const xr = gift.x * giftCos + gift.z * giftSin;
+          const zr = -gift.x * giftSin + gift.z * giftCos;
           const facing =
             (options.reference ? smoothstep(0.15, 0.6, zr) : smoothstep(-0.3, 0, zr)) * clamp01((t - gift.t0 - 1.0) / 0.5);
           if (facing < 0.03) return;
@@ -1115,9 +1133,9 @@ export function createTreeRenderer(canvas, options = {}) {
             blit(
               c,
               getGlyph(name[j]),
-              (0.6 + 0.4 * gift.rib[0]) * facing,
-              (0.6 + 0.4 * gift.rib[1]) * facing,
-              (0.6 + 0.4 * gift.rib[2]) * facing,
+              (options.reference ? 0.6 + 0.4 * gift.rib[0] : gift.col[0]) * facing,
+              (options.reference ? 0.6 + 0.4 * gift.rib[1] : gift.col[1]) * facing,
+              (options.reference ? 0.6 + 0.4 * gift.rib[2] : gift.col[2]) * facing,
             );
             drawn++;
           }
@@ -1132,6 +1150,8 @@ export function createTreeRenderer(canvas, options = {}) {
         const theta = (tAbs * TAU) / OPT.spin;
         const cosT = Math.cos(theta),
           sinT = Math.sin(theta);
+        const giftTheta = theta * giftCycles;
+        const giftCos = Math.cos(giftTheta), giftSin = Math.sin(giftTheta);
         const invCW = 1 / cellW,
           invCH = 1 / cellH;
 
@@ -1141,7 +1161,9 @@ export function createTreeRenderer(canvas, options = {}) {
 
         // 1. project every visible point; the nearest one wins its cell
         for (let i = 0, i3 = 0; i < count; i++, i3 += 3) {
-          if (t < T[i] || (!options.reference && (K[i] === NEEDLE || K[i] === SNOWCAP) && (Math.imul(i + 1, 2654435761) >>> 0) / 4294967296 >= (options.state?.fullness ?? 1))) {
+          if (t < T[i] || (!options.reference && (K[i] === NEEDLE || K[i] === SNOWCAP) &&
+            ((Math.imul(i + 1, 2654435761) >>> 0) / 4294967296 >= Math.pow(options.state?.fullness ?? 1, 2) ||
+             Math.hypot(P[i3], P[i3 + 2]) > envelope(P[i3 + 1]) * (0.4 + 0.7 * (options.state?.fullness ?? 1))))) {
             ptCell[i] = -1;
             continue;
           }
@@ -1149,8 +1171,9 @@ export function createTreeRenderer(canvas, options = {}) {
             y = P[i3 + 1] - LOOK_Y,
             z = P[i3 + 2];
           const billboard = K[i] === STAR; // the star ignores the spin
-          const xr = billboard ? x : x * cosT + z * sinT;
-          const zr = billboard ? z : -x * sinT + z * cosT;
+          const isGift = K[i] === GIFT || K[i] === RIBBON;
+          const xr = billboard ? x : isGift ? x * giftCos + z * giftSin : x * cosT + z * sinT;
+          const zr = billboard ? z : isGift ? -x * giftSin + z * giftCos : -x * sinT + z * cosT;
           const yv = y * COS_P - zr * SIN_P;
           let zv = y * SIN_P + zr * COS_P;
           const w = (CAM_DIST / (CAM_DIST - zv)) * scale;
@@ -1281,8 +1304,9 @@ export function createTreeRenderer(canvas, options = {}) {
             const nx = N[i3],
               ny = N[i3 + 1],
               nz = N[i3 + 2];
-            const nxr = nx * cosT + nz * sinT;
-            const nzr = -nx * sinT + nz * cosT;
+            const giftNormal = kind === GIFT || kind === RIBBON;
+            const nxr = giftNormal ? nx * giftCos + nz * giftSin : nx * cosT + nz * sinT;
+            const nzr = giftNormal ? -nx * giftSin + nz * giftCos : -nx * sinT + nz * cosT;
             const diff = Math.max(0, nxr * LX + ny * LY + nzr * LZ);
             const depth = 0.8 + 0.2 * clamp01((cellZ[c] + 1.2) / 2.4);
             const r0 = C[i3],
@@ -1296,7 +1320,7 @@ export function createTreeRenderer(canvas, options = {}) {
               G = g0 * k;
               B = b0 * k;
             } else if (kind === BALL) {
-              const li = (0.35 + 0.75 * diff) * depth;
+              const li = (options.reference ? 0.35 + 0.75 * diff : 0.45 + 0.65 * diff) * depth;
               const spec =
                 Math.pow(Math.max(0, nxr * HX + ny * HY + nzr * HZ), 30) * 0.9;
               R = r0 * li + spec;
@@ -1409,12 +1433,17 @@ export function createTreeRenderer(canvas, options = {}) {
           const w = (CAM_DIST / (CAM_DIST - zv)) * scale;
           const sx = centerX,
             sy = centerY - yv * w;
-          const pulse = 0.85 + 0.15 * Math.sin(tAbs * frequency(2.1));
+          const activity = options.reference ? 0 : (options.state?.twinkle ?? 0);
+          const pulse = options.reference ? 0.85 + 0.15 * Math.sin(tAbs * frequency(2.1)) :
+            0.9 - 0.45 * activity + (0.1 + 0.45 * activity) * Math.pow(0.5 + 0.5 * Math.sin(tAbs * frequency(2.1)), 2);
+          const aura = 1 + activity * (1.4 + 1.8 * pulse);
           ctx.globalAlpha = starOn * pulse;
           ctx.drawImage(
             starSprite,
-            sx - starSprite.width / 2,
-            sy - starSprite.height / 2,
+            sx - starSprite.width * aura / 2,
+            sy - starSprite.height * aura / 2,
+            starSprite.width * aura,
+            starSprite.height * aura,
           );
           ctx.lineWidth = Math.max(1.5, dpr * 1.5);
           ctx.setLineDash([cellW * 0.7, cellW * 0.5]);

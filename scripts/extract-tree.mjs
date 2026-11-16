@@ -33,6 +33,23 @@ config += `
 
 let geometry = between('      // ---------------------------------------------------------------- helpers', '      // ---------------------------------------------------------------- renderer');
 geometry = replace(geometry, 'const rng = makeRng(7);', 'const rng = makeRng(options.reference ? 7 : (options.seed ?? 7));');
+geometry = replace(geometry, '        // --- trunk: a cylinder with bark stripes', `        // --- trunk: a cylinder with bark stripes
+        const trunkRadius = 0.085 * (options.reference ? 1 : 0.75 + 0.85 * (options.state?.fullness ?? 1));`);
+geometry = replace(geometry, '0.085 * Math.cos(a)', 'trunkRadius * Math.cos(a)');
+geometry = replace(geometry, '0.085 * Math.sin(a)', 'trunkRadius * Math.sin(a)');
+geometry = replace(geometry, 'const rad = rng.range(0.05, 0.07) * (0.8 + 0.4 * (1 - u));',
+  'const rad = rng.range(0.05, 0.07) * (0.8 + 0.4 * (1 - u)) * (options.reference ? 1 : 1.25);');
+geometry = replace(geometry, '        const bow = fibSphere(400);', `        if (!options.reference && options.state) {
+          const languages = options.state.languages.slice(0, 6);
+          const templates = gifts.slice();
+          gifts.splice(0, gifts.length, ...languages.map((language, index) => ({
+            ...templates[index % templates.length],
+            ang: 0.5 + index * TAU / languages.length,
+            col: [1, 3, 5].map(offset => parseInt(language.color.slice(offset, offset + 2), 16) / 255),
+            rib: [0.95, 0.95, 1],
+          })));
+        }
+        const bow = fibSphere(400);`);
 
 let setup = between('      // Camera: orbiting', '      // ---------------------------------------------------------------- overlay text');
 setup = replace(setup, 'dpr = Math.min(window.devicePixelRatio || 1, 2);', 'dpr = 1;');
@@ -49,12 +66,35 @@ setup = replace(setup,
   'g.font = `bold ${Math.round(cellH * 0.92)}px Consolas, "Cascadia Mono", Menlo, "DejaVu Sans Mono", monospace`;',
   'g.font = `bold ${Math.round(cellH * 0.92)}px ${options.fontFamily ?? \'Consolas, "Cascadia Mono", Menlo, "DejaVu Sans Mono", monospace\'}`;');
 setup = replace(setup, '        fwSprites = FW_COLORS.map((c) => makeGlow(c, scale * 0.6));\n        fwGlyphs = Array.from(FW_RAMP, getGlyph);\n', '');
+setup = replace(setup, 'Math.min(3000, Math.max(380, 2 * halfW * (top - bottom) * 34))',
+  'Math.min(3000, Math.max(380, 2 * halfW * (top - bottom) * 34)) * (options.reference ? 1 : 0.25)');
 
 let overlay = between('      // ---------------------------------------------------------------- overlay text', "      // ---------------------------------------------------------------- Santa's sleigh");
 overlay = replace(overlay, 'tAbs * 2.2 - cell.col * 0.22', 'tAbs * frequency(2.2) - cell.col * 0.22');
 overlay = replace(overlay, 'smoothstep(0.15, 0.6, zr) * clamp01((t - gift.t0 - 1.0) / 0.5)',
   '(options.reference ? smoothstep(0.15, 0.6, zr) : smoothstep(-0.3, 0, zr)) * clamp01((t - gift.t0 - 1.0) / 0.5)');
+overlay = replace(overlay, '        scene.gifts.forEach((gift, gi) => {', `        const giftAngle = options.reference ? 0 : tAbs * TAU / 24 * (giftCycles - 1);
+        const giftCos = Math.cos(Math.atan2(sinT, cosT) + giftAngle);
+        const giftSin = Math.sin(Math.atan2(sinT, cosT) + giftAngle);
+        scene.gifts.forEach((gift, gi) => {`);
+overlay = replace(overlay, 'gift.x * cosT + gift.z * sinT', 'gift.x * giftCos + gift.z * giftSin');
+overlay = replace(overlay, '-gift.x * sinT + gift.z * cosT', '-gift.x * giftSin + gift.z * giftCos');
+for (let channel = 0; channel < 3; channel++) {
+  overlay = replace(overlay, `(0.6 + 0.4 * gift.rib[${channel}]) * facing`,
+    `(options.reference ? 0.6 + 0.4 * gift.rib[${channel}] : gift.col[${channel}]) * facing`);
+}
 let frame = between('      function render(t, tAbs, dt)', '      function frame(now)');
+frame = replace(frame, '        const invCW = 1 / cellW,', `        const giftTheta = theta * giftCycles;
+        const giftCos = Math.cos(giftTheta), giftSin = Math.sin(giftTheta);
+        const invCW = 1 / cellW,`);
+frame = replace(frame, 'const xr = billboard ? x : x * cosT + z * sinT;',
+  'const isGift = K[i] === GIFT || K[i] === RIBBON;\n          const xr = billboard ? x : isGift ? x * giftCos + z * giftSin : x * cosT + z * sinT;');
+frame = replace(frame, 'const zr = billboard ? z : -x * sinT + z * cosT;',
+  'const zr = billboard ? z : isGift ? -x * giftSin + z * giftCos : -x * sinT + z * cosT;');
+frame = replace(frame, 'const nxr = nx * cosT + nz * sinT;',
+  'const giftNormal = kind === GIFT || kind === RIBBON;\n            const nxr = giftNormal ? nx * giftCos + nz * giftSin : nx * cosT + nz * sinT;');
+frame = replace(frame, 'const nzr = -nx * sinT + nz * cosT;',
+  'const nzr = giftNormal ? -nx * giftSin + nz * giftCos : -nx * sinT + nz * cosT;');
 frame = replace(frame,
   '            f.y[j] -= f.speed[j] * dt;\n            if (f.y[j] < f.bottom) f.y[j] += span;',
   `            if (options.reference) {
@@ -75,6 +115,8 @@ frame = replace(frame, 'tAbs * 5 + PH[i]', 'tAbs * frequency(5) + PH[i]');
 frame = replace(frame, 'tAbs * 2.3 + PH[i] * 7', 'tAbs * frequency(2.3) + PH[i] * 7');
 frame = replace(frame, 'Math.sin(tAbs * 3)', 'Math.sin(tAbs * frequency(3))');
 frame = replace(frame, 'Math.sin(tAbs * 2.1)', 'Math.sin(tAbs * frequency(2.1))');
+frame = replace(frame, 'const li = (0.35 + 0.75 * diff) * depth;',
+  'const li = (options.reference ? 0.35 + 0.75 * diff : 0.45 + 0.65 * diff) * depth;');
 frame = replace(frame, 'tAbs * 2.4 + k * 1.7', 'tAbs * frequency(2.4) + k * 1.7');
 frame = replace(frame,
   `        // 3b. Fireworks behind the optional greeting and Santa's passing team.
@@ -92,18 +134,33 @@ frame = replace(frame,
 `, '');
 // Thin the original point cloud only in personalized mode; reference mode keeps
 // every point and its original order for an exact source comparison.
-frame = replace(frame, 'if (t < T[i]) {', 'if (t < T[i] || (!options.reference && (K[i] === NEEDLE || K[i] === SNOWCAP) && (Math.imul(i + 1, 2654435761) >>> 0) / 4294967296 >= (options.state?.fullness ?? 1))) {');
+frame = replace(frame, 'if (t < T[i]) {', `if (t < T[i] || (!options.reference && (K[i] === NEEDLE || K[i] === SNOWCAP) &&
+            ((Math.imul(i + 1, 2654435761) >>> 0) / 4294967296 >= Math.pow(options.state?.fullness ?? 1, 2) ||
+             Math.hypot(P[i3], P[i3 + 2]) > envelope(P[i3 + 1]) * (0.4 + 0.7 * (options.state?.fullness ?? 1))))) {`);
+frame = replace(frame, 'const pulse = 0.85 + 0.15 * Math.sin(tAbs * frequency(2.1));', `const activity = options.reference ? 0 : (options.state?.twinkle ?? 0);
+          const pulse = options.reference ? 0.85 + 0.15 * Math.sin(tAbs * frequency(2.1)) :
+            0.9 - 0.45 * activity + (0.1 + 0.45 * activity) * Math.pow(0.5 + 0.5 * Math.sin(tAbs * frequency(2.1)), 2);
+          const aura = 1 + activity * (1.4 + 1.8 * pulse);`);
+frame = replace(frame, `            sx - starSprite.width / 2,
+            sy - starSprite.height / 2,`, `            sx - starSprite.width * aura / 2,
+            sy - starSprite.height * aura / 2,
+            starSprite.width * aura,
+            starSprite.height * aura,`);
 
 const personalize = `
       const scene = buildScene();
+      // Whole revolutions preserve the seamless 24-second export loop.
+      const giftCycles = options.reference ? 1 : Math.max(1, Math.ceil(6 / Math.max(1, scene.gifts.length)));
       const weeklyLights = new Map();
       if (!options.reference && options.state) {
         const state = options.state;
+        const languages = state.languages.slice(0, 6);
+        const languageShare = languages.reduce((sum, language) => sum + language.share, 0);
         const color = (hex) => [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16) / 255);
         const languageFor = (index) => {
-          const target = (index * 0.61803398875) % 1;
+          const target = ((index * 0.61803398875) % 1) * languageShare;
           let total = 0;
-          return state.languages.find(language => { total += language.share; return target < total; }) ?? state.languages.at(-1);
+          return languages.find(language => { total += language.share; return target < total; }) ?? languages.at(-1);
         };
         // Recolor every surface point of a bauble together, preserving its
         // sphere geometry, normals, original shading, and specular highlights.
@@ -125,7 +182,7 @@ const personalize = `
           weeklyLights.set(light.index, week);
           return { index: light.index, color: paletteIndex };
         });
-        CONFIG.gifts = state.languages.slice(0, 5).map(language => language.name);
+        CONFIG.gifts = state.languages.slice(0, 6).map(language => language.name);
       }
 `;
 
