@@ -16,8 +16,8 @@ Usage:
 Options:
   --year YEAR          Calendar year (default: current UTC year)
   --output-dir DIR     Destination (default: output)
-  --width PIXELS       Image width, 240–1080 (default: 380)
-  --height PIXELS      Image height, 300–1200 (default: 544)
+  --width PIXELS       Image width, 240–1080 (default: 420)
+  --height PIXELS      Image height, 300–1200 (default: 600)
   --fps NUMBER         GIF frames per second, 1–30 (default: 10)
   --still              PNG + interactive preview, skip GIF
   --help               Show this help
@@ -29,7 +29,7 @@ Run npm run build and npx playwright install chromium before rendering.
 async function main() {
   const { values, positionals } = parseArgs({ allowPositionals: true, options: {
     year: { type: 'string' }, 'output-dir': { type: 'string', default: 'output' },
-    width: { type: 'string', default: '380' }, height: { type: 'string', default: '544' },
+    width: { type: 'string', default: '420' }, height: { type: 'string', default: '600' },
     fps: { type: 'string', default: '10' }, still: { type: 'boolean', default: false }, help: { type: 'boolean' },
   } });
   if (values.help || !positionals.length) { console.log(help); return; }

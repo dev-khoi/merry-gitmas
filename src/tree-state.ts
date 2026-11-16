@@ -88,13 +88,12 @@ export function deriveTreeState(input: Snapshot): TreeState {
     login: snapshot.login,
     year: snapshot.year,
     seed: identitySeed(snapshot.accountId),
-    // scale: control overall size, higher scale -> taller and wider tree
-    // fullness: how thick and filled-in its branches are. Higher extend farther outward, and thickness
+    // A recognizable baseline with modest, capped growth even for very active accounts.
     contributions,
     activeWeeks: weeks.filter((week) => week.count > 0).length,
     longestStreak,
-    scale: 0.6 + 0.5 * growth,
-    fullness: 0.8 + 0.38 * growth,
+    scale: 0.82 + 0.253 * growth,
+    fullness: 0.55 + 0.2 * growth,
     twinkle: Math.min(1, recent / 100),
     weeks,
     languages: [...snapshot.languages]

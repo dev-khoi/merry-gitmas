@@ -1433,10 +1433,10 @@ export function createTreeRenderer(canvas, options = {}) {
           const w = (CAM_DIST / (CAM_DIST - zv)) * scale;
           const sx = centerX,
             sy = centerY - yv * w;
-          const activity = options.reference ? 0 : (options.state?.twinkle ?? 0);
+          const activity = options.reference ? 0 : Math.max(0, Math.min(1, options.state?.twinkle ?? 0));
           const pulse = options.reference ? 0.85 + 0.15 * Math.sin(tAbs * frequency(2.1)) :
             0.9 - 0.45 * activity + (0.1 + 0.45 * activity) * Math.pow(0.5 + 0.5 * Math.sin(tAbs * frequency(2.1)), 2);
-          const aura = 1 + activity * (1.4 + 1.8 * pulse);
+          const aura = 1 + activity * (0.2 + 0.5 * pulse);
           ctx.globalAlpha = starOn * pulse;
           ctx.drawImage(
             starSprite,

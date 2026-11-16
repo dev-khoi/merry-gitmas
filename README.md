@@ -47,7 +47,7 @@ node dist/cli.js demo --fps 15 --width 480 --height 580
 node dist/cli.js --help
 ```
 
-Defaults: 380 × 544 pixels, 10 fps, a seamless 24-second rotation **including the falling snow**. The framing includes extra space below the gifts for their language labels. Higher dimensions and frame rates increase GIF size and rendering time. `--still` skips GIF generation and writes PNG, preview, and data files; it does not remove a GIF left by an earlier render in the same folder.
+Defaults: 420 × 600 pixels, 10 fps, a seamless 24-second rotation **including the falling snow**. The framing includes extra space below the gifts for their language labels. Higher dimensions and frame rates increase GIF size and rendering time. `--still` skips GIF generation and writes PNG, preview, and data files; it does not remove a GIF left by an earlier render in the same folder.
 
 ## What your activity changes
 

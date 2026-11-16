@@ -137,10 +137,10 @@ frame = replace(frame,
 frame = replace(frame, 'if (t < T[i]) {', `if (t < T[i] || (!options.reference && (K[i] === NEEDLE || K[i] === SNOWCAP) &&
             ((Math.imul(i + 1, 2654435761) >>> 0) / 4294967296 >= Math.pow(options.state?.fullness ?? 1, 2) ||
              Math.hypot(P[i3], P[i3 + 2]) > envelope(P[i3 + 1]) * (0.4 + 0.7 * (options.state?.fullness ?? 1))))) {`);
-frame = replace(frame, 'const pulse = 0.85 + 0.15 * Math.sin(tAbs * frequency(2.1));', `const activity = options.reference ? 0 : (options.state?.twinkle ?? 0);
+frame = replace(frame, 'const pulse = 0.85 + 0.15 * Math.sin(tAbs * frequency(2.1));', `const activity = options.reference ? 0 : Math.max(0, Math.min(1, options.state?.twinkle ?? 0));
           const pulse = options.reference ? 0.85 + 0.15 * Math.sin(tAbs * frequency(2.1)) :
             0.9 - 0.45 * activity + (0.1 + 0.45 * activity) * Math.pow(0.5 + 0.5 * Math.sin(tAbs * frequency(2.1)), 2);
-          const aura = 1 + activity * (1.4 + 1.8 * pulse);`);
+          const aura = 1 + activity * (0.2 + 0.5 * pulse);`);
 frame = replace(frame, `            sx - starSprite.width / 2,
             sy - starSprite.height / 2,`, `            sx - starSprite.width * aura / 2,
             sy - starSprite.height * aura / 2,

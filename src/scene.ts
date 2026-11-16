@@ -9,11 +9,11 @@ export function mount(canvas: HTMLCanvasElement, state: TreeState) {
   treeCanvas.width = canvas.width;
   const footer = Math.round(canvas.width * 0.15);
   treeCanvas.height = canvas.height - footer;
-  const bottomPadding = Math.min(24, treeCanvas.height * 0.06);
+  const bottomPadding = Math.min(48, treeCanvas.height * 0.1);
   const layoutHeight = treeCanvas.height - bottomPadding;
   const tree = createTreeRenderer(treeCanvas, { seed: state.seed, state, fontFamily: '"JetBrains Mono", monospace', bottomPadding });
   // Bottom-anchor the crop so the spare sky is removed rather than the gifts.
-  const zoom = 1.35;
+  const zoom = 1.2;
   const cropWidth = treeCanvas.width / zoom;
   const cropHeight = treeCanvas.height / zoom;
   const cropX = (treeCanvas.width - cropWidth) / 2;
