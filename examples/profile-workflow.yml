@@ -4,10 +4,10 @@ name: Decorate my Christmas tree
 on:
   push:
     paths:
-      - '.github/workflows/gitmas.yml'
+      - ".github/workflows/gitmas.yml"
   workflow_dispatch:
   schedule:
-    - cron: '17 2 * * *'
+    - cron: "17 2 * * *"
 
 permissions:
   contents: write
@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: dev-khoi/merry-gitmas@main
+      - uses: dev-khoi/merry-gitmas@v0.1.0
         with:
           login: ${{ github.repository_owner }}
           output-dir: gitmas
