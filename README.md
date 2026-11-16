@@ -37,9 +37,11 @@ The image switches automatically with the viewer's theme. If you already use an 
 | Top six languages in public, non-fork repositories | Matching ornament colors, gifts, and language labels |
 | Number of selected languages | Fewer gifts rotate faster |
 
-Contributions include the activity GitHub exposes to the workflow token, not just commits. Language shares count repositories by their primary language; they are not a measure of coding time. The current year includes completed days through yesterday UTC. You can also choose a past year.
+- Contributions include the activity GitHub exposes to the workflow token, not just commits. Language shares count repositories by their primary language. The current year includes completed days through yesterday UTC.
 
-GIF and PNG backgrounds are transparent. Dark-mode artwork keeps its bright glow; light-mode artwork uses deeper colors, darker text, and subtler glow and ground effects. GIF glows use fine dithering; PNG preserves smooth transparency. The offline HTML preview follows your browser's light or dark theme.
+- GIF and PNG backgrounds are transparent. 
+
+- It offers Dark-mode artwork keeps its bright glow; light-mode artwork uses deeper colors, darker text, and subtler glow and ground effects. The offline HTML preview follows your browser's light or dark theme.
 
 ## Files and advanced options
 
@@ -50,4 +52,8 @@ GIF and PNG backgrounds are transparent. Dark-mode artwork keeps its bright glow
 - `tree-state.json` — calculated appearance settings.
 - `FONT-LICENSE.txt` — bundled font license.
 
-See [development and customization](docs/development.md) for rendering saved data, action inputs, and appearance controls, or [renderer extraction](docs/extraction.md) for the source-renderer details.
+## Documentation
+
+- [Development and customization](docs/development.md) — details how to build/run locally, render saved snapshots, adjust the tree's appearance, configure exports, and understand the GitHub Actions inputs.
+- [Renderer extraction](docs/extraction.md) — understand the source renderer, regenerate it, and learn how personalization and transparency are applied.
+- [Action reference](action.yml) — see the reusable action's inputs, defaults, and output paths for both light and dark artwork.
