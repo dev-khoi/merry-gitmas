@@ -23,6 +23,11 @@ export function mount(canvas: HTMLCanvasElement, state: TreeState) {
     tree.draw(seconds, buildProgress);
     ctx!.imageSmoothingEnabled = false;
     ctx!.drawImage(treeCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, treeCanvas.width, treeCanvas.height);
+    ctx!.textAlign = 'left';
+    ctx!.textBaseline = 'top';
+    ctx!.font = `${Math.max(9, canvas.width * 0.024)}px "JetBrains Mono", monospace`;
+    ctx!.fillStyle = '#94a3b8';
+    ctx!.fillText('made by dev-khoi', Math.max(16, canvas.width * 0.05), Math.max(16, canvas.width * 0.05));
     ctx!.fillStyle = '#080e1b';
     ctx!.fillRect(0, treeCanvas.height, canvas.width, footer);
     ctx!.textAlign = 'center';
