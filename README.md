@@ -1,12 +1,41 @@
 # Merry Gitmas
 
-**Your GitHub year, wrapped in lights.** A slowly rotating ASCII Christmas tree that grows from contributions, wears language-colored ornaments, and traces your active weeks with a spiral of lights.
+Turn your GitHub activity into a rotating ASCII Christmas tree, with language-colored gifts, weekly lights, falling snow, and a glowing star.
 
-The tree is mechanically extracted from the **current, locally customized `ascii-christmas-tree/index.html`** supplied for this project. It uses that file's character grid, per-cell depth buffer, shaded point-cloud branches, spherical ornaments, gifts, falling snow, and additive light/star glows. The countdown, fireworks, and Santa/reindeer effects are absent from the generated scene.
+## Use it in this repository
 
-## Try it locally
+<img src="gitmas/tree.gif" width="380" alt="dev-khoi's Merry Gitmas tree" />
 
-Requires Node.js 22 or later.
+## Add it to your GitHub profile
+
+Set this up once in your **profile repository**: the repository named exactly your GitHub username, such as `dev-khoi/dev-khoi`.
+
+1. Copy [`examples/profile-workflow.yml`](examples/profile-workflow.yml) into that repository as `.github/workflows/gitmas.yml`.
+2. Commit it to the default branch. The workflow runs immediately and then every night.
+3. Add this to your profile `README.md`:
+
+   ```html
+   <img src="gitmas/tree.gif" width="380" alt="My Merry Gitmas tree" />
+   ```
+   
+## What changes the tree?
+
+| Your activity | What you see |
+| --- | --- |
+| Total contributions in the selected year | A larger, fuller tree, with a capped maximum size |
+| Weeks with contributions | Mint spiral lights |
+| Your longest streak of active weeks | Gold spiral lights |
+| Contributions in the last seven observed days | A stronger, pulsing star aura |
+| Top six languages in public, non-fork repositories | Matching ornament colors, gifts, and language labels |
+| Number of selected languages | Fewer gifts rotate faster |
+
+Contributions include the activity GitHub exposes to the workflow token, not just commits. Language shares count repositories by their primary language; they are not a measure of coding time. The current year includes completed days through yesterday UTC. You can also choose a past year.
+
+GIF and PNG backgrounds are transparent. GIF glows use fine dithering; PNG preserves smooth transparency. The HTML preview has a dark background and works offline.
+
+## Run locally
+
+Requires **Node.js 22+**. From the Merry Gitmas folder:
 
 ```sh
 npm ci
@@ -15,110 +44,32 @@ npm run build
 npm run demo
 ```
 
-Open `output/preview.html` in your browser. It is self-contained, works offline, and includes play/pause, rotation scrubbing, a language legend, and reduced-motion support.
+Open `output/preview.html`, `output/tree.gif`, or `output/tree.png`. The demo uses illustrative data, not a real account's activity.
 
-The demo uses explicitly labeled illustrative data for `octocat`, through November 14, 2026. It does not fetch that account's actual activity.
-
-### Generate your own tree
-
-Authenticate using `gh auth login`, or supply `GH_TOKEN` / `GITHUB_TOKEN` in your environment. Then:
+To use real activity, authenticate with `gh auth login` or set `GH_TOKEN`, then run:
 
 ```sh
-node dist/cli.js generate YOUR_USERNAME
-node dist/cli.js generate YOUR_USERNAME --year 2025 --output-dir output/2025
+node dist/cli.js generate dev-khoi
 ```
 
-The default is the current UTC calendar year, through **yesterday**, so a nightly refresh only includes completed days. Past years include January 1 through December 31. January 1 has no completed day in the current year; select the previous year on that date.
-
-### Separate collection and rendering
+Choose a year or keep different examples in separate folders:
 
 ```sh
-node dist/cli.js collect YOUR_USERNAME --output-dir output/data
-node dist/cli.js render output/data/snapshot.json --output-dir output/tree
+node dist/cli.js generate dev-khoi --year 2025 --output-dir output/2025
+node dist/cli.js generate torvalds --output-dir output/torvalds
 ```
 
-Rendering a saved snapshot requires no GitHub token or network connection. Missing days and API errors fail collection rather than producing a misleading empty tree.
+The defaults are **420 × 600 pixels**, **10 fps**, and a **24-second loop**. Add `--still` to skip GIF generation, or run `node dist/cli.js --help` for all options.
 
-### Export controls
+**After changing code or checking out an older commit, run `npm run build` again and regenerate the images.** Git does not track `dist/` or `output/`, so they can contain an older build or export.
 
-```sh
-node dist/cli.js demo --still
-node dist/cli.js demo --fps 15 --width 480 --height 580
-node dist/cli.js --help
-```
+## Files and advanced options
 
-Defaults: 420 × 600 pixels, 10 fps, a seamless 24-second rotation **including the falling snow**. The framing includes extra space below the gifts for their language labels. Higher dimensions and frame rates increase GIF size and rendering time. `--still` skips GIF generation and writes PNG, preview, and data files; it does not remove a GIF left by an earlier render in the same folder.
+- `tree.gif` — animated image for your README.
+- `tree.png` — still image.
+- `preview.html` — interactive preview with pause and scrubbing controls.
+- `snapshot.json` — saved GitHub data that can be rendered again without fetching.
+- `tree-state.json` — calculated appearance settings.
+- `FONT-LICENSE.txt` — bundled font license.
 
-## What your activity changes
-
-| Data | Appearance |
-| --- | --- |
-| Selected year's contributions | Tree scale, branch reach, and strongly varying needle fullness; fully grown at 5,000 contributions |
-| Top six primary languages of current public, non-fork owned repositories | Larger, brighter ornament colors, weighted by repository count within the selected languages |
-| Up to six languages | One matching colored gift and label per language; fewer gifts orbit faster (two gifts make three revolutions per 24 seconds) |
-| Each Monday-based week touching the year | One spiral light, chronological from bottom to top |
-| Active weeks | Mint lights |
-| Earliest longest run of active weeks | Gold lights |
-| Last seven observed days | Stronger, more expansive pulsing star aura and weekly-light twinkle; maximum activity effect at 100 contributions |
-| Stable account identity | Repeatable original-style branch and ornament arrangement |
-
-Calendar years touch **53 weeks, occasionally 54**, rather than exactly 52. Counts only include days inside the selected year. Quiet and future weeks stay dim. The star is always present, and zero-activity accounts still get a healthy little tree.
-
-Contributions are **GitHub-visible calendar counts**, not a commits-only metric. Depending on the collecting token and profile settings, they can include opted-in private aggregate counts or contributions visible to that token. Repository language information is explicitly public-only. Language shares describe the current repository collection, even when rendering a previous contribution year; they are not historical coding-time measurements.
-
-## Generated files
-
-GIF and PNG exports have transparent backgrounds, including behind the captions. GIF glows use ordered alpha dithering because GIF supports only fully opaque or fully transparent pixels; PNG preserves smooth transparency. GIF frames clear between draws to prevent motion trails. The interactive preview retains its dark presentation.
-
-| File | Purpose |
-| --- | --- |
-| `tree.gif` | Looping README artwork |
-| `tree.png` | Static alternative |
-| `preview.html` | Offline interactive canvas preview with embedded renderer and font |
-| `snapshot.json` | Collected inputs, reusable for rendering |
-| `tree-state.json` | Derived metrics and weekly-light mapping |
-| `FONT-LICENSE.txt` | Bundled font's SIL Open Font License |
-
-## Put it on your profile
-
-Publish this folder as your Merry Gitmas repository, then copy [`examples/profile-workflow.yml`](examples/profile-workflow.yml) to `.github/workflows/gitmas.yml` in your profile repository. Replace `YOUR_USERNAME/merry-gitmas@main` with your real published repository and ref. You can pin a release tag or commit once available.
-
-The example runs nightly, uses the built-in GitHub token, generates the image, and commits the outputs. The reusable Action itself only generates files; the example workflow handles publication. The Action targets Ubuntu runners and installs Chromium's Linux dependencies.
-
-Add to your profile README, replacing the username and branch as appropriate:
-
-```md
-[![My Merry Gitmas tree](https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_USERNAME/main/gitmas/tree.gif)](https://github.com/YOUR_USERNAME/merry-gitmas)
-```
-
-Use `tree.png` instead for a still image. GitHub READMEs show the generated image; the interactive HTML preview can be opened locally or hosted on a static site.
-
-Action inputs: `login` (repository owner), `year` (current UTC year), `output-dir` (`gitmas`), `token` (built-in token), and `fps` (`10`). Outputs: `gif`, `png`, and `preview` paths.
-
-## Development and extraction checks
-
-```sh
-npm run check
-npm test
-npm run build
-npm run test:visual
-npx tsx tests/appearance.ts
-npm run demo
-npm run test:exports
-```
-
-The visual check compares every geometry typed-array byte and every pixel against the supplied HTML at five timestamps in both portrait and landscape layouts. It also verifies deterministic snowfall, seamless loop endpoints, and the weekly-light mapping. See [`docs/extraction.md`](docs/extraction.md) for extraction boundaries, source provenance, intentional changes, and verification details.
-
-```text
-src/github.ts       GitHub → validated snapshot
-src/snapshot.ts     Snapshot schema and offline demo
-src/tree-state.ts   Snapshot → deterministic tree parameters
-vendor/tree.js      Mechanically extracted original renderer
-src/scene.ts        Tree scene and small image caption
-src/export.ts       Chromium frames → GIF / PNG / preview
-src/cli.ts          CLI commands
-scripts/            Extraction and build
-tests/              Calendar, collection, source parity, and export checks
-```
-
-The original artwork's source snapshot has no license file. Its provenance is preserved; no blanket license is asserted over the extracted artwork. The bundled JetBrains Mono font is distributed by `@fontsource/jetbrains-mono` under the SIL Open Font License; its notice is embedded in generated previews and copied beside exported files.
+See [development and customization](docs/development.md) for rendering saved data, action inputs, and appearance controls, or [renderer extraction](docs/extraction.md) for the source-renderer details.

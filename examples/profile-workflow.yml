@@ -1,7 +1,10 @@
 # Copy to .github/workflows/gitmas.yml in your profile repository.
-# Replace YOUR_USERNAME/merry-gitmas@main with your published repository/ref.
+# The account is detected automatically; no username replacement is needed.
 name: Decorate my Christmas tree
 on:
+  push:
+    paths:
+      - '.github/workflows/gitmas.yml'
   workflow_dispatch:
   schedule:
     - cron: '17 2 * * *'
@@ -18,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: YOUR_USERNAME/merry-gitmas@main
+      - uses: dev-khoi/merry-gitmas@main
         with:
           login: ${{ github.repository_owner }}
           output-dir: gitmas
