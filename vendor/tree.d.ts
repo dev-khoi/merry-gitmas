@@ -9,6 +9,7 @@ export function createTreeRenderer(canvas: HTMLCanvasElement, options?: {
 }): {
   draw(seconds: number, buildProgress?: number, dt?: number): void;
   counts: Record<string, number>;
+  readonly giftLabels: { text: string; x: number; y: number; color: string; facing: number }[];
   geometry: Record<string, ArrayLike<number>>;
   weekLights: { index: number; count: number; longest: boolean; startsOn: string }[];
 };

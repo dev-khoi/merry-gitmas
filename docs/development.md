@@ -58,6 +58,8 @@ On January 1, the current year has no completed UTC day yet; select the previous
 
 Scale changes overall size. Fullness in the current renderer filters existing needle points and limits branch reach; values above 1 do not create more branches. Keep fullness in the 0–1 range. The star aura currently peaks at 1.7× its base sprite size.
 
+Language labels and captions are drawn as bold, outlined text at the final image resolution, separately from the ASCII tree. The GIF keeps text opaque rather than applying glow dithering to its letter edges. For the sharpest README text, display the default export at its native width of 420 pixels.
+
 After editing the extraction script, regenerate the renderer and build:
 
 ```sh

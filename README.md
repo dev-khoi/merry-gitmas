@@ -2,7 +2,7 @@
 
 Turn your GitHub activity into a rotating ASCII Christmas tree, with language-colored gifts, weekly lights, falling snow, and a glowing star.
 
-<img src="gitmas/tree.gif" width="380" alt="dev-khoi's Merry Gitmas tree" />
+<img src="gitmas/tree.gif" width="420" alt="dev-khoi's Merry Gitmas tree" />
 
 ## How to set up your own GITMAS tree
 
@@ -13,7 +13,7 @@ Set this up once in your **profile repository**: the repository named exactly yo
 3. Add this to your profile `README.md`:
 
    ```html
-   <img src="gitmas/tree.gif" width="380" alt="My Merry Gitmas tree" />
+   <img src="gitmas/tree.gif" width="420" alt="My Merry Gitmas tree" />
    ```
 
 ## What shapes the tree?

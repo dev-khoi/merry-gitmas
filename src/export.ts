@@ -60,7 +60,7 @@ export async function exportTree(input: Snapshot, options: ExportOptions): Promi
       const alphaThresholds = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
       for (let frame = 0; frame < frames; frame++) {
         const encoded = await page.evaluate(time => {
-          (window as unknown as { scene: { draw(time: number): void } }).scene.draw(time);
+          (window as unknown as { scene: { draw(time: number, buildProgress: number, crispText: boolean): void } }).scene.draw(time, 1, true);
           const canvas = document.querySelector('canvas')!;
           const rgba = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height).data;
           let binary = '';

@@ -92,6 +92,19 @@ overlay = replace(overlay, '        scene.gifts.forEach((gift, gi) => {', `     
         scene.gifts.forEach((gift, gi) => {`);
 overlay = replace(overlay, 'gift.x * cosT + gift.z * sinT', 'gift.x * giftCos + gift.z * giftSin');
 overlay = replace(overlay, '-gift.x * sinT + gift.z * cosT', '-gift.x * giftSin + gift.z * giftCos');
+overlay = replace(overlay, '        // gift tags: a name under each gift while it faces the viewer', `        // Personalized labels are drawn at final output resolution by the host.
+        giftLabels.length = 0;
+        // gift tags: a name under each gift while it faces the viewer`);
+overlay = replace(overlay, `          const col0 = Math.round(
+            (centerX + xr * w - gridX) / cellW - name.length / 2,
+          );`, `          if (!options.reference) {
+            giftLabels.push({ text: name, x: centerX + xr * w, y: gridY + (row + 0.5) * cellH,
+              color: options.state?.languages[gi]?.color ?? '#d9a73c', facing });
+            return;
+          }
+          const col0 = Math.round(
+            (centerX + xr * w - gridX) / cellW - name.length / 2,
+          );`);
 for (let channel = 0; channel < 3; channel++) {
   overlay = replace(overlay, `(0.6 + 0.4 * gift.rib[${channel}]) * facing`,
     `(options.reference ? 0.6 + 0.4 * gift.rib[${channel}] : gift.col[${channel}]) * facing`);
@@ -167,6 +180,7 @@ frame = replace(frame, `            sx - starSprite.width / 2,
 
 const personalize = `
       const scene = buildScene();
+      const giftLabels = [];
       // Whole revolutions preserve the seamless 24-second export loop.
       const giftCycles = options.reference ? 1 : Math.max(1, Math.ceil(6 / Math.max(1, scene.gifts.length)));
       const weeklyLights = new Map();
@@ -236,6 +250,7 @@ ${frame}
           gifts: scene.gifts.length,
           flakes: flakes.count,
         },
+        get giftLabels() { return giftLabels; },
         geometry: { positions: scene.P, normals: scene.N, colors: scene.C, kinds: scene.K,
           reveal: scene.T, phases: scene.PH, shading: scene.SH, objects: scene.O },
         weekLights: Array.from(weeklyLights, ([index, week]) => ({ index, ...week })),
