@@ -2,7 +2,7 @@
 
 ## Source and provenance
 
-The source of truth is the **current local `ascii-christmas-tree/index.html`**, including the replacement content and subsequent snowfall/effect edits supplied for this project. This is the character-grid/z-buffer version, not the earlier canvas `fillText` point-cloud renderer. The checkout originally came from [`NawaMayumi/ascii-christmas-tree`](https://github.com/NawaMayumi/ascii-christmas-tree); the recorded HTML is a customized local snapshot, not a claim about the current upstream file.
+The source of truth is the **current local `ascii-christmas-tree/index.html`**, including the replacement content and subsequent snowfall/effect edits supplied for this project. This is the character-grid/z-buffer version, not the earlier canvas `fillText` point-cloud renderer. The recorded HTML is a customized local snapshot.
 
 `vendor/original.html` is a **byte-for-byte copy** of that supplied file. `vendor/source.json` records its SHA-256, renderer type, and customized status. Extraction does not edit the source checkout. The supplied checkout has no license file; no blanket license is asserted over the artwork.
 

@@ -2,7 +2,7 @@
 
 **Your GitHub year, wrapped in lights.** A slowly rotating ASCII Christmas tree that grows from contributions, wears language-colored ornaments, and traces your active weeks with a spiral of lights.
 
-The tree is mechanically extracted from the **current, locally customized `ascii-christmas-tree/index.html`** supplied for this project. It uses that file's character grid, per-cell depth buffer, shaded point-cloud branches, spherical ornaments, gifts, falling snow, and additive light/star glows. The countdown, fireworks, and Santa/reindeer effects are absent from the generated scene. The source checkout originated from [ASCII Christmas Tree](https://github.com/NawaMayumi/ascii-christmas-tree); the activity-to-artwork concept is inspired by [Git Koi](https://github.com/yalongwastaken/git-koi).
+The tree is mechanically extracted from the **current, locally customized `ascii-christmas-tree/index.html`** supplied for this project. It uses that file's character grid, per-cell depth buffer, shaded point-cloud branches, spherical ornaments, gifts, falling snow, and additive light/star glows. The countdown, fireworks, and Santa/reindeer effects are absent from the generated scene.
 
 ## Try it locally
 

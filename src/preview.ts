@@ -29,7 +29,6 @@ a { color: #a3c6e8; }
 <p id="summary"></p><p class="legend" id="legend"></p>
 <p>Each spiral light is one Monday-based calendar week (${state.weeks.length} this year). Mint = active; gold = longest streak; dim = quiet or upcoming. Lower lights come first. Gift labels show your languages.</p>
 <p>Ornament colors show primary-language shares of current public, non-fork owned repositories. Activity is measured through ${state.observedOn} UTC.${state.demo ? ' This is illustrative demo data.' : ' Contribution counts reflect what GitHub exposes to the collecting token.'}</p>
-<p>Tree artwork: <a href="https://github.com/NawaMayumi/ascii-christmas-tree">NawaMayumi/ascii-christmas-tree</a> · Inspired by <a href="https://github.com/yalongwastaken/git-koi">Git Koi</a>.</p>
 </main><script type="text/plain" id="font-license">${fontLicense.replace(/<\/script/gi, '<\\/script')}</script>
 <script>${bundle.replace(/<\/script/gi, '<\\/script')}</script>
 <script>
