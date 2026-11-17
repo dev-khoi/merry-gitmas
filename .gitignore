@@ -5,3 +5,4 @@ test-output/
 .env
 *.log
 scripts/generate-examples.mjs
+demo

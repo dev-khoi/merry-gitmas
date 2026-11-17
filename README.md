@@ -1,12 +1,31 @@
-# Merry Gitmas
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="gitmas/tree.gif" />
+    <source media="(prefers-color-scheme: light)" srcset="gitmas/tree-light.gif" />
+    <img src="gitmas/tree-light.gif" width="420" alt="dev-khoi's Merry Gitmas tree" />
+  </picture>
+</p>
 
-Turn your GitHub activity into a rotating ASCII Christmas tree, with language-colored gifts, weekly lights, falling snow, and a glowing star.
+<h1 align="center">Build your own Gitmas tree 🎄</h1>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="gitmas/tree.gif" />
-  <source media="(prefers-color-scheme: light)" srcset="gitmas/tree-light.gif" />
-  <img src="gitmas/tree-light.gif" width="420" alt="dev-khoi's Merry Gitmas tree" />
-</picture>
+<p align="center">
+  Turn your GitHub activity into a rotating ASCII Christmas tree, with language-colored gifts, weekly lights, falling snow, and a glowing star.
+</p>
+
+<p align="center">
+  <a href="#how-to-set-up-your-own-gitmas-tree"><b>Set up your tree</b></a>
+  &nbsp;·&nbsp;
+  <a href="#what-shapes-the-tree">How it works</a>
+  &nbsp;·&nbsp;
+  <a href="#documentation">Documentation</a>
+  &nbsp;·&nbsp;
+  <a href="action.yml">Action reference</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/dev-khoi/merry-gitmas/stargazers"><img src="https://img.shields.io/github/stars/dev-khoi/merry-gitmas?label=stars&color=238636" alt="GitHub stars" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-238636" alt="License: MIT" /></a>
+</p>
 
 ## How to set up your own GITMAS tree
 
@@ -17,11 +36,13 @@ Set this up once in your **profile repository**: the repository named exactly yo
 3. Add this to your profile `README.md`:
 
    ```html
-   <picture>
-     <source media="(prefers-color-scheme: dark)" srcset="gitmas/tree.gif" />
-     <source media="(prefers-color-scheme: light)" srcset="gitmas/tree-light.gif" />
-     <img src="gitmas/tree-light.gif" width="420" alt="My Merry Gitmas tree" />
-   </picture>
+   <p align="center">
+     <picture>
+       <source media="(prefers-color-scheme: dark)" srcset="gitmas/tree.gif" />
+       <source media="(prefers-color-scheme: light)" srcset="gitmas/tree-light.gif" />
+       <img src="gitmas/tree-light.gif" width="420" alt="My Merry Gitmas tree" />
+     </picture>
+   </p>
    ```
 
 The image switches automatically with the viewer's theme. If you already use an older workflow, update its commit step to include `tree-light.gif` and `tree-light.png` as shown in the example.
@@ -39,9 +60,9 @@ The image switches automatically with the viewer's theme. If you already use an 
 
 - Contributions include the activity GitHub exposes to the workflow token, not just commits. Language shares count repositories by their primary language. The current year includes completed days through yesterday UTC.
 
-- GIF and PNG backgrounds are transparent. 
+- GIF and PNG backgrounds are transparent.
 
-- It offers Dark-mode artwork keeps its bright glow; light-mode artwork uses deeper colors, darker text, and subtler glow and ground effects. The offline HTML preview follows your browser's light or dark theme.
+- Dark-mode artwork keeps its bright glow; light-mode artwork uses deeper colors, darker text, and subtler glow and ground effects. The offline HTML preview follows your browser's light or dark theme.
 
 ## Files and advanced options
 
@@ -53,6 +74,8 @@ The image switches automatically with the viewer's theme. If you already use an 
 - `FONT-LICENSE.txt` — bundled font license.
 
 ## Documentation
+
+- [Reconstruction video](demo/) — review `demo/index.html`, then run `npm run render:demo` to generate an 18-second, 1080×1920 portrait video with a continuous TypeScript code scan and a six-second spinning finale.
 
 - [Development and customization](docs/development.md) — details how to build/run locally, render saved snapshots, adjust the tree's appearance, configure exports, and understand the GitHub Actions inputs.
 - [Renderer extraction](docs/extraction.md) — understand the source renderer, regenerate it, and learn how personalization and transparency are applied.

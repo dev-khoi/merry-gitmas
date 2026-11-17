@@ -4,13 +4,20 @@
   "private": true,
   "description": "Your GitHub year, wrapped in ASCII Christmas lights.",
   "type": "module",
-  "engines": { "node": ">=22" },
-  "bin": { "merry-gitmas": "dist/cli.js" },
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "merry-gitmas": "dist/cli.js"
+  },
   "scripts": {
     "extract": "node scripts/extract-tree.mjs",
     "build": "node scripts/build.mjs",
+    "build:demo": "node scripts/build-demo.mjs",
+    "render:demo": "node scripts/render-demo.mjs",
     "check": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
+    "test:demo": "npm run build:demo && node tests/demo.mjs",
     "test:visual": "tsx tests/visual.ts",
     "test:exports": "tsx tests/exports.ts",
     "demo": "tsx src/cli.ts demo",
@@ -25,6 +32,7 @@
   "devDependencies": {
     "@types/node": "^22.19.0",
     "esbuild": "^0.25.12",
+    "ffmpeg-static": "^5.3.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
